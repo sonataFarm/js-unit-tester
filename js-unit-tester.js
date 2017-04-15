@@ -1,8 +1,15 @@
 /* js-unit-tester.js
-   by Nate Festinger
+   authored by sonataFarm
    v.0 4/10/17
    
    framework for unit testing functions in JS
+
+!!! TODOS
+- Test.prototype.assertEquals
+    - add comparisons for:
+        - object
+        - array
+        - function?
 
 /* Data Definitions
    ---------------- */
@@ -14,22 +21,19 @@
      - runs is natural, number of tests run
      - fails is natural, number of failed tests */
 
-function Test(fn, name) { 
+function Test(fn) { 
     
   this.fn = fn;
-  this.name = name;
+  this.name = fn.name;
   this.runs = 0;
   this.fails = 0;
   
 }
 
-
 /* TestSuite is new TestSuite()
-   interp. constructor for a test suite with: 
-     - tests object contains unit tests */
+   interp. constructor for a test suite */
 
 function TestSuite() {
-  this.tests = {};
 }
 
 
@@ -56,7 +60,6 @@ Test.prototype.assertEquals = function(args, expected) {
   
 }
 
-
 /* Test.prototype.errMsg : array, value, value -> string
    return error message given an array of arguments,
    an expected value and an actual value
@@ -81,19 +84,18 @@ Test.prototype.errMsg = function(args, expected, actual) {
 }
 
 
-/* TestSuite.prototype.newTest : function, string -> undefined
+/* TestSuite.prototype.addTest : function, string -> undefined
    instantiate a new test type in test object */
 
-TestSuite.prototype.newTest = function(fn, name) {
-  if (this.tests[name]) {
-    console.log("error: test for '" + name + "' already exists')");
+TestSuite.prototype.addTest = function(fn) {
+  if (this[fn.name]) {
+    console.log("error: test for '" + fn.name + "' already exists')");
   } else {
-    this.tests[name] = new Test(fn, name);
+    this[fn.name] = new Test(fn);
   }
 }
-
   
-/* TestSuite.prototype.logResult : ->
+/* TestSuite.prototype.logResults : ->
    log a summary of test results
    
    examples: 
@@ -106,7 +108,7 @@ TestSuite.prototype.newTest = function(fn, name) {
        "Didn't run any tests!"
    */
   
-TestSuite.prototype.logResult = function() {
+TestSuite.prototype.logResults = function() {
   var runs = this.totalRuns();
   var fails = this.totalFails();
   if (!runs) {
@@ -144,9 +146,12 @@ TestSuite.prototype.totalFails = function() {
 TestSuite.prototype.total = function(key) {
   
   var total = 0;
-  that = this.tests;
-  for (var test in that) {
-    total += that[test][key];
+  
+  for (var test in this) {
+    if (this[test].hasOwnProperty(key)) {
+      console.log(this[test][key]);
+      total += this[test][key];
+    }
   }
   
   return total;
