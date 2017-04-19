@@ -12,33 +12,47 @@
         - functions?
 
 - Better test messages (a la Hack Reactor)
-
+- either: 
+        - passed [testName]; or
+        - FAILED [testName]: Expected "expected", got "actual"
 */
 
-Function.prototype.renderErrMsg = function(args, expected, actual) {
-  var msg = this.name + '(';
-  args.forEach(function(element){ msg += String(element) + ", "; } );
-  msg = msg.slice(0, msg.length - 2);
-  msg += ') failed\n';
+function bracket(str) {
+  // return string enclosed in brackets
+  return '[' + str + ']';
+}
 
-  msg += 'Expected result: ' + String(expected) + '\n';
-  msg += 'Actual result: ' + String(actual) + '\n';
-  msg += '-------------';
-
-  return msg;  
-  
+Function.prototype.renderFailMsg = function(expected, actual, testName) {
+  var msg = 'FAILED ' + bracket(testName) + ': Expected ' + expected + ', got ' + actual;
+  return msg;
 };
 
+Function.prototype.renderPassMsg = function(expected, actual, testName) {
+  var msg = 'passed ' + bracket(testName);
+  return msg; 
+}
+   
 Function.prototype.assertEquals = function() {  
-    
-  var expected = arguments[arguments.length - 1];
-  var args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+  
+  /* run test and log result
+
+   expects the following arguments, in order:
+      - each argument to pass to test function
+      - expected result
+      - test name (string)                     */
+  
+  var testName = arguments[arguments.length - 1];
+  var expected = arguments[arguments.length - 2];
+  var args = Array.prototype.slice.call(arguments, 0, arguments.length - 2);
   var actual = this.apply(null, args);
   
   if (actual === expected) {
+    var msg = this.renderPassMsg(expected, actual, testName);
+    console.log(msg);
     return true;
   } else {
-    console.log(this.renderErrMsg(args, expected, actual));
+    var msg = this.renderFailMsg(expected, actual, testName);
+    console.log(msg);
     return false; 
   }
   
