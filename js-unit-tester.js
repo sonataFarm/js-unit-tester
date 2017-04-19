@@ -9,7 +9,17 @@
     - add comparisons for:
         - object
         - array
-        - function?
+        - functions?
+
+- Better test messages (a la Hack Reactor)
+
+- Refactor assertEqual use 'call' vs. 'apply'
+   (tired of typing arguments into array...this can get confusing)
+   
+- add test method to function prototype 
+   
+*/
+   
 
 /* Data Definitions
    ---------------- */
@@ -40,19 +50,28 @@ function TestSuite() {
 /*  Methods
    --------- */
 
-/* Test.prototype.assertEquals : array, value -> boolean
-   return true if array of arguments applied to function equals the expected value, 
-   else log error to console and return false */
+/* Test.prototype.assertEquals : 
+   
+   log results of test applying supplied arguments to parent test
+   
+   expects the following arguments, in order:
+      - each argument to pass to test function, separated by commas
+      - expected result
+   
+   log results of test on containing function */
 
-Test.prototype.assertEquals = function(args, expected) {
+Test.prototype.assertEquals = function() {  
   
-  this.runs++;
+  this.runs++; // track runs for reporting
   
+  var expected = arguments[arguments.length - 1];
+  var args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+  console.log('args: ' + args);
   var actual = this.fn.apply(null, args);
   if (actual === expected) {
     return true;
   } else {
-    this.fails++;
+    this.fails++; // track fails for reporting
     console.log(this.errMsg(args, expected, actual));
     
     return false; 
@@ -156,3 +175,13 @@ TestSuite.prototype.total = function(key) {
   
   return total;
 }
+
+// Testing for AssertEquals
+var sum = function(a, b, c) {
+  return a + b + c;
+}
+
+var ts = new TestSuite();
+
+ts.addTest(sum);
+ts.sum.assertEquals(1, 2, 3);
