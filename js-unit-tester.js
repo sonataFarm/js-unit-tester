@@ -2,17 +2,12 @@
    authored by sonataFarm
    v.0 4/10/17
    
-   framework for unit testing functions in JS
+   a simple JS unit testing framework
+   
+   adds assertEquals() and assertMethodEquals() to Function prototype
 
 !!! TODOS
     -----
-    - add comparisons for:
-        - object
-        - array
-        - functions?
-    
-    - add assertWithinRange function
-    
     - areEqual : exclude invalid types 
 */
 
@@ -118,3 +113,35 @@ Function.prototype.assertEquals = function() {
     return false; 
   } 
 }
+
+Function.prototype.assertMethodEquals = function() {  
+  
+/* run test and log result
+   for functions only; test methods with assertMethodEquals
+
+ expects the following arguments, in order:
+    - binding object for method to act on
+    - arguments to pass to test function
+    - expected result
+    - test name (string)                     */
+
+  var testName = arguments[arguments.length - 1];
+  var expected = arguments[arguments.length - 2];
+  var parent = arguments[0];
+  var args = Array.prototype.slice.call(arguments, 1, arguments.length - 2);
+  
+  var actual = this.apply(parent, args);
+   
+  var passed = areEqual(expected, actual);
+
+  if (passed) {
+    var msg = this.renderPassMsg(expected, actual, testName);
+    console.log(msg);
+    return true;
+  } else {
+    var msg = this.renderFailMsg(expected, actual, testName);
+    console.log(msg);
+    return false; 
+  } 
+}
+
