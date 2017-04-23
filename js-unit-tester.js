@@ -1,16 +1,15 @@
-/* js-unit-tester.js
-   authored by sonataFarm
-   v.0 4/10/17
+/* js-unit-tester.js 1.0.1
+   by Nate Festinger
    
-   a simple JS unit testing framework
+   a simple JS unit testing framework: 
    
    - adds assertEquals() and assertMethodEquals() methods onto Function prototype
    
    - comparison support for: 
        - primitives (Number, String, Boolean, null, undefined)
-       - objects
+       - objects 
        - arrays 
-       (any other types encountered will result in unpredictable behavior)
+       (other types may result in unpredictable behavior)
    
    WARNING: Will mutate native Function prototype! */
 
@@ -18,21 +17,20 @@
 Function.prototype.assertEquals = function() {  
   
 /* run test and log result
-   for function testing only; test methods with assertMethodEquals()
+   for function tests only; test methods with assertMethodEquals()
 
   expects the following arguments, in order:
     - parameters to pass to test function
     - expected result
     - test name (string) */
 
-  var testName = arguments[arguments.length - 1];
-  var expected = arguments[arguments.length - 2];
   var args = Array.prototype.slice.call(arguments, 0, arguments.length - 2);
+  var expected = arguments[arguments.length - 2];
+  var testName = arguments[arguments.length - 1];
+  
   var actual = this.apply(null, args);
-   
-  var passed = areEqual(expected, actual);
 
-  if (passed) {
+  if (areEqual(expected, actual)) {
     var msg = this.renderPassMsg(expected, actual, testName);
     console.log(msg);
     return true;
@@ -46,27 +44,26 @@ Function.prototype.assertEquals = function() {
 Function.prototype.assertMethodEquals = function() {  
   
 /* run test and log result
-   for method testing only; test functions with assertEquals()
+   for method tests only; test functions with assertEquals()
 
   expects the following arguments, in order:
-    - parent object for method to act on
+    - parent object to bind method to
     - parameters to pass to test function
     - expected result
     - test name (string) */
 
-  var testName = arguments[arguments.length - 1];
-  var expected = arguments[arguments.length - 2];
   var parent = arguments[0];
   var args = Array.prototype.slice.call(arguments, 1, arguments.length - 2);
+  var testName = arguments[arguments.length - 1];
+  var expected = arguments[arguments.length - 2];
   
   var actual = this.apply(parent, args);
    
-  var passed = areEqual(expected, actual);
-
-  if (passed) {
+  if (areEqual(expected, actual)) {
     var msg = this.renderPassMsg(expected, actual, testName);
     console.log(msg);
     return true;
+    
   } else {
     var msg = this.renderFailMsg(expected, actual, testName);
     console.log(msg);
@@ -76,49 +73,54 @@ Function.prototype.assertMethodEquals = function() {
 
 
 function areEqual(a, b) {
-  /* return true if a and b are 'equal', i.e. strictly equal (===) and contain identical values.
+  /* return true if a and b are 'equal', i.e. contain identical values
      performs deep comparison on objects and arrays 
      
-     ASSUMES: a, b are primitives (Number, String, Boolean, null, undefined), objects or arrays */
+     Assumes a, b are primitive (Number, String, Boolean, null, undefined), object or array */
   
   if (!areSameType(a, b)) {
     return false; 
   }
   
-  if (isPrimitive(a)) {
-    
+  if (isPrimitive(a)) {  
     return a === b;
-    
-  } else if (a instanceof Array) {
-    var areSameLength = a.length === b.length; 
-    var containSameItems = a.every(function(item, index) {
-      return areEqual(item, b[index]);
-    });
-    
-    return areSameLength && containSameItems;
   
+  } else if (a instanceof Array) {
+    return areSameLength(a, b) && containSameItems(a, b);
+
   } else { 
-    // else a, b are objects
-    var containSameNumberOfProps = countProperties(a) === countProperties(b);
-    
-    var propsContainSameValues = true;
-    for (var prop in a) {
-      if (!areEqual(a[prop], b[prop])) {
-        propsContainSameValues = false;
-      }  
-    }
-    
-    return containSameNumberOfProps && propsContainSameValues;
-  }   
+    // else a, b are objects    
+    return containSameNumberOfProps(a, b) && propsContainSameValues(a, b);
+  } 
+}
+
+
+function areSameLength(a, b) {
+  // a, b: arrays
+  return a.length === b.length;
+}
+
+
+function containSameItems (a, b) {
+  // a, b: arrays
+  return a.every(function(item, index) {
+    return areEqual(item, b[index]);
+  });
 }
 
 
 function areSameType(a, b) {
-  if (a === undefined || a === null) {
+  if (a == undefined || b == undefined) {
     return a === b;
+    
   } else {
     return a.constructor === b.constructor;
   } 
+}
+
+
+function containSameNumberOfProps(a, b) {
+  return countProperties(a) === countProperties(b);
 }
 
 
@@ -130,6 +132,17 @@ function countProperties(obj) {
   }
   
   return count;
+}
+
+
+function propsContainSameValues(a, b) {
+  // a, b: objects 
+  for (var prop in a) {
+    if (!areEqual(a[prop], b[prop])) {
+      return false;
+    }
+  }
+  return true; 
 }
 
 
