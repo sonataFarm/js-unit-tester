@@ -1,21 +1,19 @@
 /* js-unit-tester.js 1.0.1
    by Nate Festinger
    
-   a simple JS unit testing framework: 
+   a simple JS unit testing framework
    
    - adds assertEquals() and assertMethodEquals() methods onto Function prototype
    
    - comparison support for: 
        - primitives (Number, String, Boolean, null, undefined)
-       - objects 
-       - arrays 
-       (other types may result in unpredictable behavior)
+       - deep comparison for objects, arrays
+       - other types may result in unpredictable behavior
    
    WARNING: Will mutate native Function prototype! */
 
 
 Function.prototype.assertEquals = function() {  
-  
 /* run test and log result
    for function tests only; test methods with assertMethodEquals()
 
@@ -41,8 +39,8 @@ Function.prototype.assertEquals = function() {
   } 
 }
 
+
 Function.prototype.assertMethodEquals = function() {  
-  
 /* run test and log result
    for method tests only; test functions with assertEquals()
 
@@ -146,9 +144,7 @@ function propsContainSameValues(a, b) {
 }
 
 
-function isPrimitive(obj) {
-  /* return true if object is a primitive (Number, String, Boolean, undefined or null) */
-  
+function isPrimitive(obj) {  
   var PRIMITIVE_TYPES = ['number', 'string', 'boolean', 'undefined'];
   
   return obj === null || PRIMITIVE_TYPES.includes(typeof obj); 
@@ -168,6 +164,5 @@ Function.prototype.renderFailMsg = function(expected, actual, testName) {
 
 
 function bracket(str) {
-  // return string enclosed in brackets
   return '[' + str + ']';
 }
