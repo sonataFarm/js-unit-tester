@@ -1,4 +1,4 @@
-/* js-unit-tester.js 1.0.1
+/* js-unit-tester.js 1.0.2
    by Nate Festinger
    
    a simple JS unit testing framework
@@ -126,7 +126,9 @@ function countProperties(obj) {
   var count = 0;
   
   for (var property in obj) {
-    ++count;
+    if (obj.hasOwnProperty(property)) {
+      ++count;
+    }
   }
   
   return count;
@@ -135,9 +137,11 @@ function countProperties(obj) {
 
 function propsContainSameValues(a, b) {
   // a, b: objects 
-  for (var prop in a) {
-    if (!areEqual(a[prop], b[prop])) {
-      return false;
+  for (var property in a) {
+    if (a.hasOwnProperty(property)) {
+      if (!areEqual(a[property], b[property])) {
+        return false;
+      }
     }
   }
   return true; 
